@@ -7,17 +7,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Stretch Timer" />
-  <!-- Optional: add an icon file if you create one -->
-  <!-- <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" /> -->
-
   <link rel="manifest" href="manifest.json" />
   <title>Stretch Timer</title>
 
   <style>
     :root{
       --bg: #0b0f14;
-      --card: rgba(255,255,255,0.06);
-      --card2: rgba(255,255,255,0.10);
       --text: rgba(255,255,255,0.92);
       --muted: rgba(255,255,255,0.62);
       --muted2: rgba(255,255,255,0.40);
@@ -25,35 +20,55 @@
       --accent2: #a78bfa;
       --danger: #fb7185;
       --ok: #34d399;
+
+      /* more iOS-like */
       --radius: 22px;
-      --shadow: 0 20px 50px rgba(0,0,0,0.45);
+      --cardBorder: rgba(255,255,255,0.14);
+      --cardFill: rgba(255,255,255,0.06);
+      --shadow: 0 18px 50px rgba(0,0,0,0.50);
     }
+
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
+
     body{
       margin:0;
-      background: radial-gradient(1200px 900px at 20% 10%, rgba(167,139,250,0.20), transparent 55%),
-                  radial-gradient(1200px 900px at 85% 20%, rgba(125,211,252,0.20), transparent 55%),
-                  var(--bg);
+      background:
+        radial-gradient(1100px 820px at 18% 10%, rgba(167,139,250,0.18), transparent 60%),
+        radial-gradient(1100px 820px at 88% 20%, rgba(125,211,252,0.18), transparent 60%),
+        var(--bg);
+
       color:var(--text);
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+
+      /* KEY FIX: do NOT vertically center (this was hiding the timer for you) */
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       justify-content:center;
-      padding: env(safe-area-inset-top) 14px env(safe-area-inset-bottom) 14px;
+
+      padding: calc(env(safe-area-inset-top) + 12px) 14px calc(env(safe-area-inset-bottom) + 14px) 14px;
     }
+
     .app{
       width:min(520px, 100%);
       display:flex;
       flex-direction:column;
       gap:14px;
+
+      /* KEY FIX: ensure full height so top content stays reachable */
+      min-height: 100vh;
+      padding-top: 8px;
     }
+
     .topbar{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      padding: 8px 4px;
+      padding: 8px 6px;
     }
+
     .brand{
       display:flex;
       flex-direction:column;
@@ -62,16 +77,16 @@
     .brand .title{
       font-size:16px;
       letter-spacing:0.2px;
-      color:var(--text);
-      font-weight:650;
+      font-weight:700;
     }
     .brand .subtitle{
       font-size:12px;
       color:var(--muted);
     }
+
     .pill{
       background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
       padding: 8px 10px;
       border-radius: 999px;
       font-size:12px;
@@ -80,33 +95,44 @@
       gap:8px;
       align-items:center;
       user-select:none;
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
     }
-    .pill b{ color:var(--text); font-weight:650; }
+    .pill b{ color:var(--text); font-weight:700; }
+
     .card{
-      background: linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.045));
-      border: 1px solid rgba(255,255,255,0.10);
+      background: var(--cardFill);
+      border: 1px solid var(--cardBorder);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       overflow:hidden;
+
+      /* iOS glass */
+      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(18px);
     }
+
     .card-inner{
       padding: 18px 18px 14px 18px;
       display:flex;
       flex-direction:column;
       gap:12px;
     }
+
     .stretch-name{
       font-size:18px;
-      font-weight:700;
+      font-weight:750;
       letter-spacing:0.2px;
       line-height:1.2;
     }
+
     .hint{
       font-size:13px;
       color:var(--muted);
       line-height:1.35;
       margin-top:-6px;
     }
+
     .timer-row{
       display:flex;
       align-items:flex-end;
@@ -114,31 +140,34 @@
       gap:14px;
       padding-top: 6px;
     }
+
     .time{
       font-variant-numeric: tabular-nums;
       font-size:54px;
-      font-weight:800;
+      font-weight:850;
       letter-spacing:-1px;
       line-height:1;
     }
+
     .meta{
       display:flex;
       flex-direction:column;
       align-items:flex-end;
       gap:6px;
-      min-width: 140px;
+      min-width: 150px;
     }
     .meta .small{
       font-size:12px;
       color:var(--muted2);
     }
+
     .progress-wrap{
       width:100%;
       height:10px;
       border-radius:999px;
       background: rgba(255,255,255,0.08);
       overflow:hidden;
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.10);
     }
     .progress{
       height:100%;
@@ -147,14 +176,16 @@
       border-radius:999px;
       transition: width 250ms ease;
     }
+
     .controls{
       display:grid;
       grid-template-columns: 1fr 1.4fr 1fr;
       gap:10px;
       padding: 14px 18px 18px 18px;
       background: rgba(255,255,255,0.03);
-      border-top: 1px solid rgba(255,255,255,0.08);
+      border-top: 1px solid rgba(255,255,255,0.10);
     }
+
     button{
       appearance:none;
       border:none;
@@ -163,31 +194,39 @@
       font-size:14px;
       color:var(--text);
       background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.14);
       cursor:pointer;
-      transition: transform 120ms ease, background 200ms ease, border-color 200ms ease;
       user-select:none;
+
+      /* iOS tap reliability */
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+
+      transition: transform 120ms ease, background 200ms ease, border-color 200ms ease;
     }
-    button:active{ transform: scale(0.98); }
-    button:hover{ background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.16); }
+    button:active{ transform: scale(0.985); }
+    button:hover{ background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); }
+
     .primary{
-      background: linear-gradient(90deg, rgba(125,211,252,0.22), rgba(167,139,250,0.22));
-      border-color: rgba(255,255,255,0.18);
-      font-weight:700;
+      background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.08));
+      border-color: rgba(255,255,255,0.22);
+      font-weight:750;
     }
-    .ghost{
-      background: rgba(255,255,255,0.04);
-    }
+
+    .ghost{ background: rgba(255,255,255,0.05); }
+
     .danger{
       background: rgba(251,113,133,0.12);
-      border-color: rgba(251,113,133,0.22);
+      border-color: rgba(251,113,133,0.26);
     }
+
     .list{
       padding: 10px 12px;
       display:flex;
       flex-direction:column;
       gap:8px;
     }
+
     .row{
       display:flex;
       align-items:center;
@@ -195,15 +234,18 @@
       gap:10px;
       padding: 12px 12px;
       background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.10);
       border-radius: 16px;
       transition: background 200ms ease, border-color 200ms ease, transform 120ms ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     .row.active{
-      background: rgba(125,211,252,0.11);
-      border-color: rgba(125,211,252,0.25);
+      background: rgba(125,211,252,0.10);
+      border-color: rgba(125,211,252,0.24);
     }
-    .row:active{ transform: scale(0.995); }
+    .row:active{ transform: scale(0.992); }
+
     .left{
       display:flex;
       flex-direction:column;
@@ -215,7 +257,7 @@
     }
     .left .s{
       font-size:14px;
-      font-weight:650;
+      font-weight:700;
       color: var(--text);
     }
     .right{
@@ -224,31 +266,38 @@
       color: var(--muted);
       white-space:nowrap;
     }
+
     .footer{
-      padding: 0 4px;
+      padding: 0 6px;
       display:flex;
       justify-content:space-between;
       align-items:center;
       color: var(--muted2);
       font-size:12px;
     }
+
     .toggle{
       display:flex;
       gap:10px;
       align-items:center;
     }
+
     .switch{
       width:42px; height:24px;
       border-radius:999px;
       background: rgba(255,255,255,0.10);
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.14);
       position:relative;
       cursor:pointer;
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     .knob{
       width:18px; height:18px;
       border-radius:999px;
-      background: rgba(255,255,255,0.85);
+      background: rgba(255,255,255,0.86);
       position:absolute;
       top:50%;
       transform: translateY(-50%);
@@ -260,6 +309,7 @@
       border-color: rgba(52,211,153,0.22);
     }
     .switch.on .knob{ left:20px; background: rgba(255,255,255,0.92); }
+
     .sr{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
   </style>
 </head>
@@ -278,6 +328,7 @@
       </div>
     </div>
 
+    <!-- TIMER CARD (this is where Start lives) -->
     <div class="card">
       <div class="card-inner">
         <div class="stretch-name" id="stretchName">Half-Kneeling Hip Flexor</div>
@@ -303,13 +354,14 @@
       </div>
 
       <div class="controls">
-        <button class="ghost" id="prevBtn">Prev</button>
-        <button class="primary" id="playBtn">Start</button>
-        <button class="ghost" id="nextBtn">Next</button>
-        <button class="danger" id="resetBtn" style="grid-column:1 / span 3;">Reset</button>
+        <button class="ghost" id="prevBtn" type="button">Prev</button>
+        <button class="primary" id="playBtn" type="button">Start</button>
+        <button class="ghost" id="nextBtn" type="button">Next</button>
+        <button class="danger" id="resetBtn" type="button" style="grid-column:1 / span 3;">Reset</button>
       </div>
     </div>
 
+    <!-- LIST CARD -->
     <div class="card">
       <div class="list" id="list"></div>
     </div>
@@ -327,8 +379,7 @@
   </div>
 
   <script>
-    // --- Routine steps (edit durations here if you want) ---
-    // durationSeconds: each entry is a timed "step". For left/right stretches we make 2 steps.
+    // Routine steps (edit durations here if you want)
     const steps = [
       { name: "Half-Kneeling Hip Flexor", hint: "Tuck pelvis slightly, squeeze glute, reach overhead.", durationSeconds: 60, side: "Left" },
       { name: "Half-Kneeling Hip Flexor", hint: "Tuck pelvis slightly, squeeze glute, reach overhead.", durationSeconds: 60, side: "Right" },
@@ -351,17 +402,17 @@
 
       { name: "Doorway Chest Stretch", hint: "Forearms on frame, step through gently.", durationSeconds: 60, side: "Both" },
 
-      { name: "Deep Squat Hold", hint: "Elbows press knees out, keep chest tall.", durationSeconds: 60, side: "Hold" },
+      { name: "Deep Squat Hold", hint: "Elbows press knees out, keep chest tall.", durationSeconds: 60, side: "Hold" }
     ];
 
-    // --- State ---
+    // State
     let idx = 0;
     let running = false;
     let remaining = steps[0].durationSeconds;
     let tickHandle = null;
     let buzzOn = true;
 
-    // --- Elements ---
+    // Elements
     const el = (id) => document.getElementById(id);
     const stepIdxEl = el("stepIdx");
     const stepTotalEl = el("stepTotal");
@@ -381,7 +432,7 @@
     const resetBtn = el("resetBtn");
     const buzzSwitch = el("buzzSwitch");
 
-    // --- Helpers ---
+    // Helpers
     function fmt(sec){
       sec = Math.max(0, Math.floor(sec));
       const m = Math.floor(sec/60);
@@ -399,7 +450,7 @@
     }
     function setStatus(msg){ statusTextEl.textContent = msg; }
 
-    // --- UI render ---
+    // UI
     function renderList(){
       listEl.innerHTML = "";
       steps.forEach((st, i) => {
@@ -447,7 +498,7 @@
       remainingTimeEl.textContent = fmt(t);
     }
 
-    // --- Timer logic ---
+    // Timer logic
     function clearTick(){
       if(tickHandle) clearInterval(tickHandle);
       tickHandle = null;
@@ -459,7 +510,6 @@
       setStatus("Running");
       playBtn.textContent = "Pause";
 
-      // iOS requires a user gesture to allow vibration reliably; clicking Start counts.
       tickHandle = setInterval(() => {
         remaining -= 1;
         if(remaining <= 0){
@@ -495,6 +545,7 @@
       safeBuzz([20,30,20]);
       setStatus("Ready");
       render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function prev(){
@@ -504,14 +555,13 @@
       safeBuzz([20,30,20]);
       setStatus("Ready");
       render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function next(auto=false){
-      // if auto, keep running; if manual, pause
       if(!auto) pause();
 
       if(idx >= steps.length - 1){
-        // Finished
         running = false;
         clearTick();
         remaining = 0;
@@ -520,6 +570,7 @@
         safeBuzz([120,80,120]);
         playBtn.textContent = "Restart";
         render();
+        window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }
 
@@ -529,11 +580,11 @@
       setStatus(auto ? "Running" : "Ready");
 
       if(auto){
-        // keep running, tickHandle already set
         render();
       } else {
         render();
       }
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function reset(){
@@ -542,11 +593,11 @@
       remaining = steps[0].durationSeconds;
       setStatus("Ready");
       render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    // --- Events ---
+    // Events
     playBtn.addEventListener("click", () => {
-      // If finished, restart
       if(!running && idx === steps.length - 1 && remaining === 0){
         reset();
         start();
@@ -567,14 +618,15 @@
     buzzSwitch.addEventListener("keydown", (e) => {
       if(e.key === "Enter" || e.key === " "){
         e.preventDefault();
-        buzzSwitch.click();	
+        buzzSwitch.click();
       }
     });
 
-    // --- PWA service worker ---
+    // PWA service worker
     if("serviceWorker" in navigator){
       window.addEventListener("load", async () => {
         try{
+          // optional cache bust if you changed sw version:
           await navigator.serviceWorker.register("sw.js");
         }catch(e){
           // ignore
